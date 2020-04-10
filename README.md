@@ -1,2 +1,5 @@
 # Jay-Patravali-F110-2020
-HW submission
+
+
+* I am part of virtualFastKeyboardFurious team in this course. 
+* Our weekly meeting time is Monday 4pm.
