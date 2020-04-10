@@ -40,12 +40,8 @@ int main(int argc, char **argv)
       for (int i = 0; i < window.size(); i++) 
           {
               sum += window[i];
-              std::cout<<window.at(i)<<' ';
           }
-      for (int i = 0; i < window.size(); i++)  
-          std::cout<<std::endl;
-
-
+          
       window.erase(window.begin()); // keeping window size at 10
       msg.data = sum/(window.size()+1);
       ROS_INFO(" Publishing Moving Window average speed: %f ",sum/(window.size()+1)); //prints average speed
