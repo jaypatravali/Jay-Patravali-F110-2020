@@ -16,8 +16,8 @@ MIN_DISTANCE = 0.1
 MAX_DISTANCE = 30.0
 MIN_ANGLE = -45.0
 MAX_ANGLE = 225.0
-LOOKAHEAD_DISTANCE = 2.5
-DESIRED_DISTANCE = 0.5
+LOOKAHEAD_DISTANCE = 3.5
+DESIRED_DISTANCE = 0.8
 THETA = 45
 # data: single message from topic /scan
 # angle: between -45 to 225 degrees, where 0 degrees is directly to the right
@@ -97,9 +97,9 @@ def followCenter(data, DESIRED_DISTANCE):
 # Callback for receiving LIDAR data on the /scan topic.
 # data: the LIDAR data, published as a list of distances to the wall.
 def scan_callback(data):
-  # error = followRight(data, DESIRED_DISTANCE)
+  error = followRight(data, DESIRED_DISTANCE)
 
-  error = followLeft(data, DESIRED_DISTANCE)
+  # error = followLeft(data, DESIRED_DISTANCE)
   # error = followCenter(data, DESIRED_DISTANCE)
 
   string = 'left'
