@@ -17,7 +17,7 @@ MAX_DISTANCE = 30.0
 MIN_ANGLE = -45.0
 MAX_ANGLE = 225.0
 LOOKAHEAD_DISTANCE = 2.5
-DESIRED_DISTANCE = 0.2
+DESIRED_DISTANCE = 0.5
 THETA = 45
 # data: single message from topic /scan
 # angle: between -45 to 225 degrees, where 0 degrees is directly to the right
@@ -58,13 +58,12 @@ def compute_projectedDistance(a, b):
 def followLeft(data, desired_distance):
 
   #diametrically opposite to right side.
-  a = getRange(data, 180)
-  b = getRange(data, 180 - THETA)
+  b = getRange(data, 180)
+  a = getRange(data, 180 - THETA)
 
   Dt_projected =compute_projectedDistance(a,b)
   left_error =  desired_distance- Dt_projected
 
-  rospy.loginfo('left error %f', left_error)
 
 
   return left_error
@@ -74,33 +73,37 @@ def followLeft(data, desired_distance):
 # Outputs the PID error required to make the car follow the right wall.
 def followRight(data, desired_distance):
 
-  a = getRange(data, 0)
-  b = getRange(data, THETA)
+  
+  a = getRange(data, THETA)
+  b = getRange(data, 0)
+
 
   Dt_projected = compute_projectedDistance(a,b)
   print (Dt_projected, desired_distance)
   right_error = Dt_projected - desired_distance
 
-  rospy.loginfo('right error %f', right_error)
 
   return right_error
 
 # data: single message from topic /scan
 # Outputs the PID error required to make the car drive in the middle
 # of the hallway.
-def followCenter(data):
-  # TODO: implement
+def followCenter(data, DESIRED_DISTANCE):
+  error_1 = followLeft(data, DESIRED_DISTANCE)
+  error_2 = followRight(data, DESIRED_DISTANCE)
 
-
-
-  return 0.0
+  return center_error
 
 # Callback for receiving LIDAR data on the /scan topic.
 # data: the LIDAR data, published as a list of distances to the wall.
 def scan_callback(data):
   # error = followRight(data, DESIRED_DISTANCE)
-  error = followLeft(data, DESIRED_DISTANCE)
 
+  error = followLeft(data, DESIRED_DISTANCE)
+  # error = followCenter(data, DESIRED_DISTANCE)
+
+  string = 'left'
+  rospy.loginfo('%s error %f', string, error)
 
   msg = Float64()
   msg.data = error

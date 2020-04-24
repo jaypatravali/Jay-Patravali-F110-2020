@@ -6,7 +6,7 @@ from std_msgs.msg import Float64
 import numpy as np
 import math
 
-KP = -0.12
+KP = 0.2
 KD = 0.00
 ANGLE_LEVEL_1 = 10.0
 SPEED_LEVEL_1 = 1.5
