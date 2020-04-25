@@ -6,3 +6,7 @@
    ii. Uncomment Line 22  in algorithms/wall_following/scripts/pid_error.py	
    iii. Uncomment Line 13 in algorithms/wall_following/scripts/control.py
 
+Run after compiling workspace
+
+-> roslaunch patravali_wall_following wall_following_sim.launch
+-> press n
