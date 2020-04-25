@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <include file="$(find racecar_simulator)/launch/simulator.launch">
-        <arg name="map" value="$(find racecar_simulator)/maps/lab_track.yaml"/>
+        <arg name="map" value="$(find racecar_simulator)/maps/map_trackporto.yaml"/>
   </include>
 
   <!-- output="screen" allows us to see print statements-->

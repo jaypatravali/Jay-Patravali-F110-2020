@@ -6,8 +6,11 @@ from std_msgs.msg import Float64
 import numpy as np
 import math
 
-KP = 0.3
-KD = 0.0
+KP = 0.6
+#comment below for center following
+KD = 0.01
+#uncomment for center following
+# KD = 0.2
 ANGLE_LEVEL_1 = 10.0
 SPEED_LEVEL_1 = 1.5
 ANGLE_LEVEL_2 = 20.0
@@ -35,8 +38,10 @@ def control_callback(msg):
     past_error = curr_error
     past_timeStamp = curr_timeStamp
 
+    delta_error_delta_time = delta_error/delta_time
+
     if flag:
-        pidoutput = KP*curr_error + KD*(delta_error/delta_time)
+        pidoutput = KP*curr_error + KD*delta_error_delta_time
     else:
         flag = True
         pidoutput = KP*curr_error
@@ -55,7 +60,7 @@ def control_callback(msg):
 
     msg = drive_param()
     msg.velocity = vel  # TODO: implement PID for velocity
-    msg.angle = -angle    # TODO: implement PID for steering angle
+    msg.angle = angle    # TODO: implement PID for steering angle
     pub.publish(msg)
 
 # Boilerplate code to start this ROS node.
