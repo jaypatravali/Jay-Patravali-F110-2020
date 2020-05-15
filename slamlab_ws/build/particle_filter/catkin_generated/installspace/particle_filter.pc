@@ -1,8 +1,0 @@
-prefix=/home/jay/F10_repos/Jay-Patravali-F110-2020/slamlab_ws/install
-
-Name: particle_filter
-Description: Description of particle_filter
-Version: 0.1.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: message_runtime rospy sensor_msgs std_msgs
