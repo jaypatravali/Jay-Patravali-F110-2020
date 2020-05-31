@@ -8,7 +8,9 @@
 6. [Update]: in report I mention changing pid values for Center following. Its now improved and no need of changing KP, KD values.
 
 
-##Run after compiling workspace
+## Run after compiling workspace
 
 ``  $roslaunch patravali_wall_following wall_following_sim.launch
-    press n
+``
+
+ Now press n
