@@ -3,6 +3,7 @@
   <include file="$(find racecar_simulator)/launch/simulator.launch">
         <arg name="map" value="$(find racecar_simulator)/maps/levine.yaml"/>
   </include>
+  <rosparam command="load" file="$(find wall_following)/config/params.yaml"/>
 
   <!-- output="screen" allows us to see print statements-->
   <node pkg="wall_following" name="pid_error_node" type="pid_error.py" output="screen"/> 

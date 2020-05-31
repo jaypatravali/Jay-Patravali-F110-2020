@@ -4,6 +4,11 @@
         <arg name="map" value="$(find racecar_simulator)/maps/map_trackporto.yaml"/>
   </include>
 
+
+  <rosparam command="load" file="$(find patravali_wall_following)/config/params.yaml"/>
+
+
+
   <!-- output="screen" allows us to see print statements-->
   <node pkg="wall_following" name="pid_error_node" type="pid_error.py" output="screen"/> 
   <node pkg="wall_following" name="control_node" type="control.py" output="screen"/>

@@ -7,25 +7,21 @@ import yaml
 import sys
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Float64
-import pdb
 
 pub = rospy.Publisher('pid_error', Float64, queue_size=10)
 
 # You can define constants in Python as uppercase global names like these.
-MIN_DISTANCE = 0.1
-MAX_DISTANCE = 30.0
-MIN_ANGLE = -45.0
-MAX_ANGLE = 225.0
-LOOKAHEAD_DISTANCE = 1.5  
-DESIRED_DISTANCE = 0.7  
-#uncomment below for center following
-# LOOKAHEAD_DISTANCE =  2.5
-THETA = 45
-# data: single message from topic /scan
-# angle: between -45 to 225 degrees, where 0 degrees is directly to the right
-# Outputs length in meters to object with angle in lidar scan field of view
-def getRange(data, angle):
+MIN_DISTANCE = rospy.get_param('MIN_DISTANCE')
+MAX_DISTANCE = rospy.get_param('MAX_DISTANCE')
+MIN_ANGLE = rospy.get_param('MIN_ANGLE')
+MAX_ANGLE = rospy.get_param('MAX_ANGLE')
 
+
+THETA = rospy.get_param('THETA')
+LOOKAHEAD_DISTANCE = rospy.get_param('LOOKAHEAD_DISTANCE')
+DESIRED_DISTANCE = rospy.get_param('DESIRED_DISTANCE')
+
+def getRange(data, angle):
 
   data_arr = np.array(data.ranges)
   #filter data
@@ -45,14 +41,17 @@ def getRange(data, angle):
   return range_val
 
 
-def compute_projectedDistance(a, b):
+def compute_projectedDistance(a, b, flag=''):
     num = a*np.cos(np.radians(THETA)) - b
     denom= a*np.sin(np.radians(THETA))
     alpha = np.arctan2(num, denom)
 
     Dt = b*np.cos(alpha)
+    if flag =='center':
+        Dt = 0
     Dt_projected = Dt + LOOKAHEAD_DISTANCE*np.sin(alpha)
     return Dt_projected
+
 
 # data: single message from topic /scanc
 # desired_distance: desired distance to the left wall [meters]
@@ -66,7 +65,7 @@ def followLeft(data, desired_distance):
   Dt_projected =compute_projectedDistance(a,b)
   left_error =  Dt_projected - desired_distance
 
-  return left_error
+  return left_error, Dt_projected
 
 # data: single message from topic /scan
 # desired_distance: desired distance to the right wall [meters]
@@ -78,33 +77,48 @@ def followRight(data, desired_distance):
   Dt_projected = compute_projectedDistance(a,b)
   right_error =  desired_distance - Dt_projected
 
-  return right_error
+  return right_error, Dt_projected
 
 # data: single message from topic /scan
 # Outputs the PID error required to make the car drive in the middle
 # of the hallway.
 def followCenter(data, DESIRED_DISTANCE):
-  left_error = followLeft(data, DESIRED_DISTANCE)
-  right_error = followRight(data, DESIRED_DISTANCE)
-  return (left_error + right_error)/2.0 #  
+    a = getRange(data, THETA)
+    b = getRange(data, 0)
+    theta = np.deg2rad(THETA)
+    tan_alpha = (a*math.cos(theta) - b)/(a*math.sin(theta))
+    alpha = math.atan(tan_alpha)
+
+    Dt_projected = compute_projectedDistance(a,b, 'center')
+
+    _, left_dist  = followLeft(data, DESIRED_DISTANCE)
+    _, right_dist  = followRight(data, DESIRED_DISTANCE)
+    center_error = left_dist - right_dist - Dt_projected  
+    return center_error
 
 # Callback for receiving LIDAR data on the /scan topic.
 # data: the LIDAR data, published as a list of distances to the wall.
 def scan_callback(data):
-  # error = followRight(data, DESIRED_DISTANCE)
-  error = followLeft(data, DESIRED_DISTANCE)
-  # error = followCenter(data, DESIRED_DISTANCE)
+    left_error, _ = followLeft(data, DESIRED_DISTANCE)
+    right_error, _ = followRight(data, DESIRED_DISTANCE)
+    center_error = followCenter(data, DESIRED_DISTANCE)
 
-  string = 'left'
-  rospy.loginfo('%s error %f', string, error)
+    DIRECTION = rospy.get_param('DIRECTION')
+    
+    if DIRECTION == 'left':
+        error = left_error
+    elif DIRECTION == 'right':
+       error = right_error
+    elif DIRECTION == 'center':
+       error = center_error
 
-  msg = Float64()
-  msg.data = error
-  pub.publish(msg)
+    msg = Float64()
+    msg.data = error
+    pub.publish(msg)
 
 # Boilerplate code to start this ROS node.
 # DO NOT MODIFY!
 if __name__ == '__main__':
-  rospy.init_node('pid_error_node', anonymous = True)
-  rospy.Subscriber("scan", LaserScan, scan_callback)
-  rospy.spin()
+    rospy.init_node('pid_error_node', anonymous = True)
+    rospy.Subscriber("scan", LaserScan, scan_callback)
+    rospy.spin()
