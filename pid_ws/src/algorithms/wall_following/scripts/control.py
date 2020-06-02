@@ -41,11 +41,10 @@ def control_callback(msg):
     vel = rospy.get_param('VELOCITY')
 
     degree_angle =  math.degrees(angle)
-    # if abs(degree_angle) >= 0.0 and abs(degree_angle) <= ANGLE_LEVEL_1:
+
     if  0.0 <= abs(degree_angle)  and abs(degree_angle) <= ANGLE_LEVEL_1:
         vel = vel
     elif  ANGLE_LEVEL_1<= abs(degree_angle) and abs(degree_angle) <= ANGLE_LEVEL_2:
-    # elif abs(degree_angle) >=ANGLE_LEVEL_1 and abs(degree_angle) <= ANGLE_LEVEL_2:
         vel = SPEED_LEVEL_2
     
     else:
